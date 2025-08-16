@@ -46,14 +46,14 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const email = ref('')
 const password = ref('')
-const loading = ref(false)
 const error = ref('')
 
-    const goToTodos = () => {
+const goToTodos = () => {
     router.push('/todos')   // ✅ 무조건 Todo 페이지로 이동
-    }
+    console.log('이동했습니다');
+}
 
-    const onSubmit = async () => {
+const onSubmit = async () => {
     try {
         const res = await api.post('/auth/login', { email: email.value, password: password.value })
         localStorage.setItem('accessToken', res.data.accessToken)
@@ -61,5 +61,5 @@ const error = ref('')
     } catch (e) {
         error.value = '로그인 실패'
     }
-    }
+}
 </script>
