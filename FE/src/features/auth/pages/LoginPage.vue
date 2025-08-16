@@ -1,4 +1,5 @@
 <template>
+    <NavBar />
     <div class="min-h-[70vh] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow p-8">
             <h1 class="text-2xl font-bold mb-6 text-center">로그인</h1>
@@ -15,16 +16,19 @@
                     <input v-model="password" type="password" autocomplete="current-password"
                         class="w-full rounded-xl border px-4 py-2 focus:ring-2 focus:ring-blue-400 outline-none" />
                 </div>
-
-                <button :disabled="loading"
+                <button @click="goToTodos"
+                    class="w-full bg-blue-600 text-white rounded-xl py-2 hover:bg-blue-700 transition">
+                    로그인
+                </button>
+                <!-- <button :disabled="loading"
                     class="w-full bg-blue-600 text-white rounded-xl py-2 hover:bg-blue-700 transition disabled:opacity-60">
                     {{ loading ? '로그인 중...' : '로그인' }}
-                </button>
+                </button> -->
 
                 <p v-if="error" class="text-center text-sm text-red-600">{{ error }}</p>
             </form>
 
-            
+
             <p class="text-center text-sm text-gray-600 mt-4">
                 계정이 없으신가요?
                 <router-link to="/signup" class="text-blue-600 hover:underline">회원가입</router-link>
@@ -34,6 +38,7 @@
 </template>
 
 <script setup>
+import NavBar from '@/components/NavBar.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 // import { api } from '@/shared/lib/api'
@@ -44,22 +49,17 @@ const password = ref('')
 const loading = ref(false)
 const error = ref('')
 
-const onSubmit = async () => {
-    error.value = ''
-    if (!email.value || !password.value) {
-        error.value = '이메일과 비밀번호를 입력해주세요.'
-        return
+    const goToTodos = () => {
+    router.push('/todos')   // ✅ 무조건 Todo 페이지로 이동
     }
-    loading.value = true
+
+    const onSubmit = async () => {
     try {
         const res = await api.post('/auth/login', { email: email.value, password: password.value })
-        localStorage.setItem('accessToken', res.accessToken)
-        localStorage.setItem('user', JSON.stringify(res.user))
+        localStorage.setItem('accessToken', res.data.accessToken)
         router.push('/todos')
     } catch (e) {
-        error.value = e.message || '로그인에 실패했습니다.'
-    } finally {
-        loading.value = false
+        error.value = '로그인 실패'
     }
-}
+    }
 </script>

@@ -1,23 +1,22 @@
-// src/app/router/routes.js
-export const routes = [
+// src/router/routes.js
+import MainLayout from '@/layouts/MainLayout.vue'
+import LoginPage from '@/features/auth/pages/LoginPage.vue'
+import SignupPage from '@/features/auth/pages/SignupPage.vue'
+import TodoPage from '@/features/todo/pages/TodoPage.vue'
+
+const routes = [
   {
     path: '/',
-    component: () => import('../layouts/MainLayout.vue'),
+    component: MainLayout,
     children: [
-      { path: '', redirect: '/login' },
-
-      // Auth
-      { path: 'login', component: () => import('@/features/auth/pages/LoginPage.vue') },
-      { path: 'signup', component: () => import('@/features/auth/pages/SignupPage.vue') },
-
-      // Pages
-      { path: 'todos', component: () => import('@/features/todo/pages/TodoPage.vue') },
-      { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue') },
-      { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue') },
-      { path: 'mypage', component: () => import('@/features/profile/pages/MyPage.vue') },
-    ],
+      { path: 'todos', component: TodoPage, meta: { requiresAuth: true } },
+      { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue'), meta: { requiresAuth: true } },
+      { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue'), meta: { requiresAuth: true } },
+      { path: 'profile', component: () => import('@/features/profile/pages/MyPage.vue'), meta: { requiresAuth: true } },
+    ]
   },
-
-  // 404 -> 홈으로
-  { path: '/:pathMatch(.*)*', redirect: '/' },
+  { path: '/login', component: LoginPage },
+  { path: '/signup', component: SignupPage }
 ]
+
+export default routes   // ✅ 반드시 필요
