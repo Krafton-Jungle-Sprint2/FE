@@ -1,9 +1,9 @@
 <template>
-  <div class="grid grid-cols-12 gap-4">
+  <div class="w-[100%] grid grid-cols-15 gap-4">
     <aside class="col-span-3">
       <RoomList />
     </aside>
-    <section class="col-span-9">
+    <section class="col-span-15">
       <div class="border rounded-2xl h-[70vh] flex flex-col">
         <ChatRoomHeader />
         <MessageList class="flex-1" />

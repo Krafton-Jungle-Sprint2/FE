@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-95 mx-auto bg-white rounded-lg shadow-lg p-4">
+  <div class="h-full w-95 bg-white rounded-lg shadow-lg p-4">
     <!-- 헤더 -->
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-lg font-semibold text-gray-800">기한 초과</h1>
@@ -16,7 +16,7 @@
 
     <!-- 할일 개수 -->
     <div class="text-xs text-gray-500 mb-3">
-      할일 {{ tasks.length }}
+      할 일 {{ tasks.length }}
     </div>
 
     <!-- 할일 목록 -->
@@ -32,9 +32,9 @@ import TaskList from '../components/TaskList.vue'
 const isAddingTask = ref(false)
 
 const tasks = ref([
-  { id: 1, title: '주택청약 저축', status: '8월 2일', completed: false },
+  { id: 1, title: '저축', status: '8월 1일', completed: false },
   { id: 2, title: '과제', status: '어제', completed: false },
-  { id: 3, title: '중요', status: '어제', completed: false }
+  { id: 3, title: '운동', status: '어제', completed: false }
 ])
 
 const addTask = (title) => {
