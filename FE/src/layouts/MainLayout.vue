@@ -1,19 +1,17 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <NavBar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
-
-    <div class="pt-14 flex">
-      <!-- 좌측 사이드바 -->
+    <!-- 한 곳에서 사이드바 폭 정의 -->
+    <div class="pt-14 flex" style="--sidebar-w: 10rem;"> <!-- 10rem = w-40 -->
       <SideNav :open="sidebarOpen" @close="sidebarOpen = false" />
-
-      <!-- 메인 컨텐츠 -->
-      <main
-        class="flex-1 max-w-full container py-6">
+      <!-- 본문 좌여백도 동일 변수 사용 -->
+      <main class="flex-1 container mx-auto px-4 py-6 md:ml-[var(--sidebar-w)]">
         <router-view />
       </main>
     </div>
   </div>
 </template>
+
 
 <script setup>
 
