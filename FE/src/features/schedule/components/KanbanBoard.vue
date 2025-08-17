@@ -1,13 +1,7 @@
 <template>
   <div class="bg-white rounded-2xl shadow p-4">
     <div class="mb-4 flex items-center justify-between">
-      <h2 class="font-semibold text-lg">Kanban</h2>
-      <button
-        class="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700"
-        @click="openAdd()"
-      >
-        + 작업 추가
-      </button>
+      <h2 class="font-semibold text-lg">카테고리</h2>
     </div>
 
     <!-- 컬럼: 카테고리 -->

@@ -199,7 +199,7 @@ const getMaxLevelByCategory = (categoryId) => {
 
 const getCategoryLaneHeight = (categoryId) => {
   const maxLevel = getMaxLevelByCategory(categoryId)
-  const minHeight = 64 // 최소 높이
+  const minHeight = 64
   const levelHeight = 40 // 각 레벨당 높이
   return (maxLevel + 1) * levelHeight + 24 // 24px는 패딩
 }
@@ -212,13 +212,13 @@ const getTaskStyle = (task) => {
   const startDiff = startDate.diff(rangeStart, 'day')
   const duration = endDate.diff(startDate, 'day') + 1
   
-  const left = startDiff * 96 // 96px per day (w-24)
+  const left = startDiff * 96
   const width = duration * 96
   
   // 태스크 레벨 계산
   const taskLevels = calculateTaskLevels(props.tasks)
   const level = taskLevels.get(task.id) || 0
-  const top = 12 + (level * 40) // 각 레벨당 40px 간격
+  const top = 12 + (level * 40)
   
   return {
     left: `${Math.max(0, left)}px`,
@@ -265,12 +265,11 @@ const startResize = (task, direction, event) => {
   document.addEventListener('mouseup', handleMouseUp)
 }
 
-// 마우스 이동 처리
 const handleMouseMove = (event) => {
   if (!dragState.value.currentTask) return
   
   const deltaX = event.clientX - dragState.value.startX
-  const daysDelta = Math.round(deltaX / 96) // 96px per day
+  const daysDelta = Math.round(deltaX / 96)
   
   const task = dragState.value.currentTask
   const originalStart = dayjs(dragState.value.originalStartDate)
@@ -300,10 +299,8 @@ const handleMouseMove = (event) => {
   }
 }
 
-// 마우스 업 처리
 const handleMouseUp = () => {
   if (dragState.value.currentTask) {
-    // 백엔드에 변경사항 저장
     emit('update-task', {
       id: dragState.value.currentTask.id,
       startDate: dragState.value.currentTask.startDate,
@@ -331,22 +328,17 @@ onUnmounted(() => {
 })
 
 const totalGanttHeight = computed(() => {
-  const headerHeight = 60 // 헤더 높이
+  const headerHeight = 60
   const categoryHeights = categories.value.reduce((total, category) => {
     return total + getCategoryLaneHeight(category.id)
   }, 0)
   
-  // 최소 400px, 최대 1200px로 제한하되 내용에 따라 동적 조정
-  const calculatedHeight = headerHeight + categoryHeights + 40 // 40px는 여유 공간
+  const calculatedHeight = headerHeight + categoryHeights + 40
   return Math.min(Math.max(calculatedHeight, 400), 1200)
 })
 </script>
 
 <style scoped>
-.gantt-container {
-  /* max-height 제거하여 동적 높이 적용 */
-}
-
 .task-bar:hover .resize-handle-left,
 .task-bar:hover .resize-handle-right {
   opacity: 1;
