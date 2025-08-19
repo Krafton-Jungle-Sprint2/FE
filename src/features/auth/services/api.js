@@ -2,7 +2,7 @@ import axios from 'axios'
 import router from '@/router'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://localhost:4000',
   withCredentials: true, // refresh token 쿠키 받으려면 필요
 })
 

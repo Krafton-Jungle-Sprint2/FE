@@ -4,6 +4,7 @@ import LoginPage from '@/features/auth/pages/LoginPage.vue'
 import SignupPage from '@/features/auth/pages/SignupPage.vue'
 import TodoPage from '@/features/todo/pages/TodoPage.vue'
 
+
 const routes = [
   { path: '/login', component: LoginPage },
   { path: '/signup', component: SignupPage },

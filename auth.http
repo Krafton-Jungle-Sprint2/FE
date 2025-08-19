@@ -1,0 +1,45 @@
+@BASE = http://localhost:4000
+@PFX  = /api/auth
+
+@email = bell{{$timestamp}}@test.com
+@password = BEllbell1223
+@nickname = bell{{$timestamp}}
+
+### register
+POST {{BASE}}{{PFX}}/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "nickname": "{{nickname}}"
+}
+
+### set tokens
+@accessToken = {{register.response.body.$.accessToken}}
+@refreshToken = {{register.response.body.$.refreshToken}}
+
+### me
+GET {{BASE}}{{PFX}}/me
+Authorization: Bearer {{accessToken}}
+
+### refresh
+POST {{BASE}}{{PFX}}/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### logout
+POST {{BASE}}{{PFX}}/logout
+Authorization: Bearer {{accessToken}}
+
+### login
+POST {{BASE}}{{PFX}}/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
