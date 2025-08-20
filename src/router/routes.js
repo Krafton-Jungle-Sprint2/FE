@@ -14,8 +14,8 @@ const routes = [
     children: [
       { path: 'todos', component: TodoPage },
       // { path: 'todos', component: TodoPage, meta: { requiresAuth: true } },
-      { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue') },//, meta: { requiresAuth: true } },
-      { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue') },//, meta: { requiresAuth: true } },
+      { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue'), alias: ['/teamchatpage'] },//, meta: { requiresAuth: true } },
+      { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue'), alias: ['/teamschedulepage'] },//, meta: { requiresAuth: true } },
       { path: 'profile', component: () => import('@/features/profile/pages/MyPage.vue') },//, meta: { requiresAuth: true } },
     ]
   }

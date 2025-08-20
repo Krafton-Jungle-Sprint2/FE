@@ -25,7 +25,7 @@
 import { useRoute } from 'vue-router'
 import { ClipboardDocumentListIcon, ChatBubbleLeftRightIcon, CalendarDaysIcon } from '@heroicons/vue/24/outline'
 
-defineProps<{ open: boolean }>()
+defineProps < { open: boolean } > ()
 const route = useRoute()
 const isActive = (to: string) => route.path.startsWith('/' + to.replace(/^\//, ''))
 

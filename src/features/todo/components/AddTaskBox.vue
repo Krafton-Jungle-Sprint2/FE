@@ -1,11 +1,8 @@
 <template>
   <div class="mb-4">
     <!-- 접힌 카드 -->
-    <div
-      v-if="!open"
-      @click="openBox"
-      class="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
-    >
+    <div v-if="!open" @click="openBox"
+      class="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
       <span class="text-gray-400 text-lg">+</span>
       <span class="text-gray-500 text-sm">새 과제</span>
       <div class="ml-auto flex items-center">
@@ -17,14 +14,8 @@
     <!-- 펼친 입력창 -->
     <div v-else class="flex items-center gap-2 px-3 py-2 border-2 border-blue-500 rounded-md">
       <span class="text-blue-500 text-lg">+</span>
-      <input
-        ref="taskInput"
-        v-model="title"
-        @keyup.enter="submit"
-        @keyup.esc="cancel"
-        placeholder="할일 제목을 입력하세요"
-        class="flex-1 outline-none text-sm"
-      />
+      <input ref="taskInput" v-model="title" @keyup.enter="submit" @keyup.esc="cancel" placeholder="할일 제목을 입력하세요"
+        class="flex-1 outline-none text-sm" />
     </div>
   </div>
 </template>
