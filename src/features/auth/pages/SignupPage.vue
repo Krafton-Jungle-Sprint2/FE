@@ -1,5 +1,6 @@
 <!-- /src/features/auth/pages/SignUpPage.vue -->
 <template>
+  <NavBar />
   <div class="min-h-[70vh] flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white rounded-2xl shadow p-8">
       <h1 class="text-2xl font-bold mb-6 text-center">회원가입</h1>
@@ -43,9 +44,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import NavBar from '@/components/NavBar.vue'
+import api from '@/shared/lib/api' // ✅ 공용 axios('/api' 프록시)
 
 const router = useRouter()
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
 const email = ref('')
 const nickname = ref('')
@@ -54,55 +56,35 @@ const loading = ref(false)
 const error = ref('')
 const success = ref(false)
 
-async function signupRequest(payload) {
-  const res = await fetch(API + '/auth/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  if (!res.ok) {
-    let msg = '회원가입에 실패했습니다.'
-    try {
-      const j = await res.json()
-      msg = j.error || j.message || msg
-    } catch { }
-    throw new Error(msg)
-  }
-  return res.json()
-}
-
 const onSubmit = async () => {
-  error.value = ''
-  success.value = false
+  error.value = ''; success.value = false
 
   const emailVal = email.value.trim().toLowerCase()
   const nickVal = nickname.value.trim()
   const passVal = password.value
 
-  if (!emailVal || !nickVal || !passVal) {
-    error.value = '모든 필드를 입력해주세요.'
-    return
-  }
-  if (passVal.length < 8) {
-    error.value = '비밀번호는 8자 이상이어야 합니다.'
-    return
-  }
+  if (!emailVal || !nickVal || !passVal) return (error.value = '모든 필드를 입력해주세요.')
+  if (passVal.length < 8) return (error.value = '비밀번호는 8자 이상이어야 합니다.')
 
   loading.value = true
   try {
-    const { user, accessToken, refreshToken } = await signupRequest({
-      email: emailVal,
-      password: passVal,
-      nickname: nickVal
+    // ✅ 회원가입 (프록시 경유: /api/auth/signup)
+    const { data } = await api.post('/auth/signup', {
+      email: emailVal, password: passVal, nickname: nickVal
     })
-    // 토큰 저장
-    localStorage.setItem('accessToken', accessToken)
-    localStorage.setItem('refreshToken', refreshToken)
-    // 성공 안내 후 이동
+
+    // ✅ access 토큰 확보 (응답에 없으면 로그인 한번 더)
+    let access = data?.accessToken || data?.token?.access
+    if (!access) {
+      const r = await api.post('/auth/login', { email: emailVal, password: passVal })
+      access = r.data?.accessToken || r.data?.token?.access
+    }
+    if (access) localStorage.setItem('accessToken', access) // refresh는 쿠키(HttpOnly)로 처리
+
     success.value = true
     setTimeout(() => router.push('/workspaces'), 500)
   } catch (e) {
-    error.value = e.message || '회원가입에 실패했습니다.'
+    error.value = e.response?.data?.message || e.message || '회원가입에 실패했습니다.'
   } finally {
     loading.value = false
   }

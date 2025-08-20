@@ -10,7 +10,7 @@
            shadow-md md:shadow-none
            md:relative md:block md:pt-0
            transition-transform" :class="[open ? 'translate-x-0' : '-translate-x-full', 'md:translate-x-0']">
-    <nav class="h-full flex flex-col p-3 gap-1">
+    <nav class="flex flex-col p-3 gap-1">
       <RouterLink v-for="item in items" :key="item.to" :to="item.to"
         class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-600/30"
         :class="isActive(item.to) ? 'bg-emerald-600 font-semibold' : ''" @click="$emit('close')">

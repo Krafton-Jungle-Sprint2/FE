@@ -1,5 +1,6 @@
 <!-- /src/components/NavBar.vue -->
 <template>
+  <!-- header를 fixed position으로 변경 -->
   <header class="top-0 left-0 right-0 h-14 bg-emerald-600 border-b z-50">
     <div class="h-full max-w-full container px-4 flex items-center justify-between">
       <div class="flex items-center gap-1">

@@ -41,7 +41,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const API = import.meta.env.VITE_API_URL || 'http://3.36.132.163:4000'
 
 const email = ref('')
 const password = ref('')
