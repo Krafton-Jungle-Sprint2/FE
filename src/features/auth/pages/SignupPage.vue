@@ -82,7 +82,7 @@ const onSubmit = async () => {
     if (access) localStorage.setItem('accessToken', access) // refresh는 쿠키(HttpOnly)로 처리
 
     success.value = true
-    setTimeout(() => router.push('/workspaces'), 500)
+    setTimeout(() => router.push('/todos'), 500) // todos 로 수정
   } catch (e) {
     error.value = e.response?.data?.message || e.message || '회원가입에 실패했습니다.'
   } finally {

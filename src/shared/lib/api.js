@@ -1,7 +1,10 @@
 // src/shared/lib/api.js
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api', withCredentials: true }) // ✅ 유지
+const api = axios.create({
+    baseURL: '/api',
+    withCredentials: true
+})
 
 
 // req: access 토큰

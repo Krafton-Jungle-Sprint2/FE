@@ -23,23 +23,18 @@
 <script setup>
 import { ref, watch, nextTick } from 'vue'
 
-const props = defineProps({
-  open: { type: Boolean, default: false }
-})
+const props = defineProps({ open: { type: Boolean, default: false } })
 const emit = defineEmits(['update:open', 'add'])
 
 const title = ref('')
 const taskInput = ref(null)
 
-watch(
-  () => props.open,
-  async (val) => {
-    if (val) {
-      await nextTick()
-      taskInput.value?.focus()
-    }
+watch(() => props.open, async (val) => {
+  if (val) {
+    await nextTick()
+    taskInput.value?.focus()
   }
-)
+})
 
 const openBox = () => emit('update:open', true)
 

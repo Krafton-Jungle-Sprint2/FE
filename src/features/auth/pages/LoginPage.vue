@@ -1,6 +1,5 @@
 <!-- /src/features/auth/pages/LoginPage.vue -->
 <template>
-    <NavBar />
     <div class="min-h-[70vh] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow p-8">
             <h1 class="text-2xl font-bold mb-6 text-center">로그인</h1>
@@ -36,12 +35,11 @@
 </template>
 
 <script setup>
-import NavBar from '@/components/NavBar.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const API = import.meta.env.VITE_API_URL || 'http://3.36.132.163:4000'
+const API = import.meta.env.VITE_API_URL || 'http://3.36.132.79:4000'
 
 const email = ref('')
 const password = ref('')
@@ -79,7 +77,8 @@ const onSubmit = async () => {
         const { user, accessToken, refreshToken } = await loginRequest({ email: emailVal, password: passVal })
         localStorage.setItem('accessToken', accessToken)
         localStorage.setItem('refreshToken', refreshToken)
-        router.push('/workspaces') // 필요시 '/todos'로 변경
+        // router.push({ name: 'todos' }) 이름 기반
+        router.push('/todos') // 필요시 '/todos'로 변경
     } catch (e) {
         error.value = e.message || '로그인에 실패했습니다.'
     } finally {

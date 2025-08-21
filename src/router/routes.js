@@ -12,7 +12,7 @@ const routes = [
     path: '/',
     component: MainLayout,
     children: [
-      { path: 'todos', component: TodoPage },
+      { path: '/todos', name: 'todos', component: TodoPage },
       // { path: 'todos', component: TodoPage, meta: { requiresAuth: true } },
       { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue'), alias: ['/teamchatpage'] },//, meta: { requiresAuth: true } },
       { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue'), alias: ['/teamschedulepage'] },//, meta: { requiresAuth: true } },

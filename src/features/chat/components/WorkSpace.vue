@@ -7,6 +7,8 @@
         <div class="flex items-center space-x-3">
           <div :class="['w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold',
             workspace?.color || 'bg-blue-500']">
+
+
             {{ (workspace?.name || '개발')[0]?.toUpperCase() }}
           </div>
           <div>

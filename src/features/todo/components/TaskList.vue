@@ -1,4 +1,4 @@
-<!-- /src/features/todos/components/TaskList.vue -->
+<!-- /src/features/todo/components/TaskList.vue -->
 <template>
   <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -23,34 +23,40 @@ const emit = defineEmits(['toggle'])
 
 const today = dayjs().startOf('day')
 const d = v => (v ? dayjs(v).startOf('day') : null)
-const startOf = t => d(t.startDate ?? t.start ?? t.start_time)
-const endOf = t => d(t.dueDate ?? t.endDate ?? t.due)
+/** 스키마에 맞춰 날짜 필드 고정 */
+const startOf = t => d(t.startDate)
+const endOf = t => d(t.dueDate)
 
+/** 완료 여부는 status === 'completed' 로만 판정 */
 const toItem = (t, label) => ({
   id: t.id,
   title: t.title,
-  completed: t.status === 'DONE',
+  completed: t.status === 'completed',
   status: label,
 })
 
 const sections = computed(() => {
+  const src = Array.isArray(props.tasks) ? props.tasks : []
   const overdue = [], todayArr = [], future = []
-  for (const t of props.tasks) {
+
+  for (const t of src) {
     const s = startOf(t), e = endOf(t)
-    if (!s || !e) continue
-    if (e.isBefore(today)) overdue.push(t)
-    else if (s.isAfter(today)) future.push(t)
-    else todayArr.push(t)
+
+    if (!s && !e) { todayArr.push(t); continue }
+    if (e && e.isBefore(today)) { overdue.push(t); continue }
+    if (s && s.isAfter(today)) { future.push(t); continue }
+    todayArr.push(t)
   }
 
-  overdue.sort((a, b) => (a.dueDate ?? a.endDate ?? '').localeCompare(b.dueDate ?? b.endDate ?? ''))
-  todayArr.sort((a, b) => (a.dueDate ?? a.endDate ?? '').localeCompare(b.dueDate ?? b.endDate ?? ''))
-  future.sort((a, b) => (a.startDate ?? '').localeCompare(b.startDate ?? ''))
+  const by = k => (a, b) => ((a?.[k] ?? '') + '').localeCompare((b?.[k] ?? '') + '')
+  overdue.sort(by('dueDate'))
+  todayArr.sort(by('dueDate'))
+  future.sort(by('startDate'))
 
-  const res = []
-  if (overdue.length) res.push({ key: 'overdue', title: '기한 지남', items: overdue.map(t => toItem(t, '기한 지남')) })
-  res.push({ key: 'today', title: '오늘 할 일', items: todayArr.map(t => toItem(t, '오늘 할 일')) })
-  res.push({ key: 'future', title: '내일 이후', items: future.map(t => toItem(t, '내일 이후')) })
-  return res
+  return [
+    { key: 'overdue', title: '기한 지남', items: overdue.map(t => toItem(t, '기한 지남')) },
+    { key: 'today', title: '오늘 할 일', items: todayArr.map(t => toItem(t, '오늘 할 일')) },
+    { key: 'future', title: '내일 이후', items: future.map(t => toItem(t, '내일 이후')) }
+  ]
 })
 </script>
