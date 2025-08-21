@@ -130,26 +130,23 @@ const dragStart = (e, id) => {
   }
 }
 const onDrop = (e, cat) => {
-  const raw = e?.dataTransfer?.getData('text/plain')
-  const id = raw ? Number(raw) : NaN
-  if (!Number.isFinite(id)) return
+  const id = e?.dataTransfer?.getData('text/plain') || ''
+  if (!id) return
   emit('move', { id, category: cat })
-  const next = (props.tasks || []).map(t => (t.id === id ? { ...t, category: cat } : t))
-  emit('update:tasks', next)
 }
 const onDragEnd = () => { setTimeout(() => { isDragging.value = false }, 100) }
 
 /* 상태 변경 */
 const onChangeStatus = (id, status) => {
   emit('update', { id, patch: { status } })
-  const next = (props.tasks || []).map(t => (t.id === id ? { ...t, status } : t))
+  const next = (props.tasks || []).map(t => (String(t.id) === String(id) ? { ...t, status } : t))
   emit('update:tasks', next)
 }
 
 /* 삭제 */
 const onDelete = (id) => {
   emit('delete', id)
-  const next = (props.tasks || []).filter(t => t.id !== id)
+  const next = (props.tasks || []).filter(t => String(t.id) !== String(id))
   emit('update:tasks', next)
 }
 
@@ -204,7 +201,6 @@ const closeModal = () => { addOpen.value = false; isEditMode.value = false }
 
 const commitAdd = () => {
   const newTask = {
-    id: Date.now(),
     title: draft.title.trim(),
     description: draft.description?.trim(),
     category: draft.category,
@@ -212,8 +208,7 @@ const commitAdd = () => {
     startDate: draft.startDate,
     endDate: draft.endDate,
   }
-  emit('create', newTask)
-  emit('update:tasks', [...(props.tasks || []), newTask])
+  emit('create', newTask) // 부모가 DB 저장 후 tasks 갱신
   closeModal()
 }
 
@@ -228,7 +223,7 @@ const commitEdit = () => {
     endDate: draft.endDate,
   }
   emit('update', { id: draft.id, patch: updatedTask })
-  const next = (props.tasks || []).map(t => (t.id === draft.id ? updatedTask : t))
+  const next = (props.tasks || []).map(t => (String(t.id) === String(draft.id) ? updatedTask : t))
   emit('update:tasks', next)
   closeModal()
 }

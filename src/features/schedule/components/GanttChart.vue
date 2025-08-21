@@ -33,21 +33,19 @@
               <div class="w-3 h-3 rounded-full mr-2 mt-1" :style="{ backgroundColor: lane.color }"></div>
               <span class="font-medium text-gray-700">{{ lane.name }}</span>
             </div>
-
-            <div class="timeline-area flex-1 relative"
-              :style="[{ minHeight: getLaneHeight(lane.id) + 'px' }, timelineBgStyle]">
-              <!-- 날짜 그리드 -->
-              <div class="date-grid flex absolute inset-0">
-                <div v-for="date in dateRange" :key="date" class="date-column border-r border-gray-100"
-                  :style="{ width: dayWidth + 'px' }"></div>
-              </div>
-
-              <!-- 작업 바 -->
-              <div v-for="task in getTasksByLane(lane.id)" :key="task.id" class="task-bar absolute cursor-move"
-                :style="getTaskStyle(task)" @mousedown="startDrag(task, $event)">
-                <div class="task-content h-8 rounded px-2 flex items-center text-white text-xs font-medium shadow-sm"
-                  :style="{ backgroundColor: lane.color }">
-                  <span class="truncate">{{ task.title }}</span>
+            <div class="timeline-area flex-1 relative" :style="{ minHeight: getLaneHeight(lane.id) + 'px' }">
+              <div class="timeline-scroll relative h-full" :style="[{ width: contentWidth + 'px' }, timelineBgStyle]">
+                <div class="date-grid flex absolute inset-0">
+                  <div v-for="date in dateRange" :key="date" class="date-column border-r border-gray-100"
+                    :style="{ width: dayWidth + 'px' }"></div>
+                </div>
+                <!-- 작업 바 -->
+                <div v-for="task in getTasksByLane(lane.id)" :key="task.id" class="task-bar absolute cursor-move"
+                  :style="getTaskStyle(task)" @mousedown="startDrag(task, $event)">
+                  <div class="task-content h-8 rounded px-2 flex items-center text-white text-xs font-medium shadow-sm"
+                    :style="{ backgroundColor: lane.color }">
+                    <span class="truncate">{{ task.title }}</span>
+                  </div>
                 </div>
 
                 <!-- 리사이즈 핸들 -->
@@ -69,7 +67,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import dayjs from '@/shared/lib/dayjs.js'
-
+const contentWidth = computed(() => dateRange.value.length * dayWidth.value)
 const MIN_W = 16, MAX_W = 160
 const dayWidth = ref(72) // px per day (가변)
 const containerEl = ref(null)
@@ -200,8 +198,9 @@ function getLaneHeight(laneId) {
 const timelineBgStyle = computed(() => {
   const w = dayWidth.value
   return {
-    background: `linear-gradient(90deg, transparent ${w - 1}px, #e5e7eb ${w - 1}px, #e5e7eb ${w}px, transparent ${w}px)`,
-    backgroundSize: `${w}px 100%`
+    background: `repeating-linear-gradient(90deg,
+      transparent 0, transparent ${w - 1}px,
+      #e5e7eb ${w - 1}px, #e5e7eb ${w}px)`
   }
 })
 
@@ -363,6 +362,10 @@ const totalGanttHeight = computed(() => {
 }
 
 .timeline-area {
+  position: relative;
+}
+
+.timeline-scroll {
   position: relative;
 }
 
