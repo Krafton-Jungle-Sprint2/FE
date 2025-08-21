@@ -10,7 +10,13 @@ const api = axios.create({
 // req: access 토큰
 api.interceptors.request.use(cfg => {
     const t = localStorage.getItem('accessToken')
-    if (t) cfg.headers.Authorization = `Bearer ${t}`
+    if (t) {
+        cfg.headers.Authorization = `Bearer ${t}`
+        console.log('🔑 요청에 토큰 추가됨:', t.slice(0, 20) + '...')
+    } else {
+        console.warn('❌ 요청에 토큰 없음')
+    }
+
     return cfg
 })
 

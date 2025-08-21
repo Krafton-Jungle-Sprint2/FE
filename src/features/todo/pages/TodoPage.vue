@@ -3,11 +3,9 @@
   <section class="space-y-4">
     <h1 class="text-xl font-bold">Todo</h1>
 
-    <!-- 입력 박스 -->
-    <AddTaskBox v-model:open="boxOpen" @add="createTaskFromBox" />
+    <AddTaskBox v-model:open="boxOpen" @add="addTask" />
 
-    <!-- 리스트 -->
-    <TaskList :tasks="tasks" @toggle="toggleTask" />
+    <TaskList :tasks="tasks" @toggle="toggleTask" @dates="updateDates" @remove="deleteTask" />
 
     <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
   </section>
@@ -17,7 +15,7 @@
 import { ref, onMounted } from 'vue'
 import AddTaskBox from '@/features/todo/components/AddTaskBox.vue'
 import TaskList from '@/features/todo/components/TaskList.vue'
-import { list, create, patch } from '@/features/auth/services/todoApi.js' // 경로 너 기준
+import { list, create, patch, remove } from '@/features/auth/services/todoApi.js' // 네 구조 기준
 
 const tasks = ref([])
 const error = ref('')
@@ -27,14 +25,15 @@ const boxOpen = ref(false)
 async function load() {
   try {
     const data = await list()
+    console.log('[todos]', data) // 배열인지 확인
     tasks.value = Array.isArray(data) ? data : []
   } catch (e) {
-    error.value = e.message || '로드 실패'
+    error.value = e.message;
     tasks.value = []
   }
 }
 
-async function createTaskFromBox(title) {
+async function addTask(title) {
   const t = (title ?? '').trim()
   if (!t) return
   loading.value = true; error.value = ''
@@ -44,12 +43,9 @@ async function createTaskFromBox(title) {
     boxOpen.value = false
   } catch (e) {
     error.value = e.message || '추가 실패'
-  } finally {
-    loading.value = false
-  }
+  } finally { loading.value = false }
 }
 
-/** 체크박스 토글: completed ↔ status 매핑 */
 async function toggleTask(id, completed) {
   try {
     await patch(id, { status: completed ? 'completed' : 'pending' })
@@ -60,5 +56,20 @@ async function toggleTask(id, completed) {
   }
 }
 
+async function updateDates(id, { startDate, dueDate }) {
+  await patch(id, { startDate, dueDate })
+  const it = tasks.value.find(v => v.id === id)
+  if (it) {
+    it.startDate = startDate;
+    it.dueDate = dueDate
+  }
+}
+
+async function deleteTask(id) {
+  await remove(id)
+  tasks.value = tasks.value.filter(t => t.id !== id)
+}
+
 onMounted(load)
+
 </script>
