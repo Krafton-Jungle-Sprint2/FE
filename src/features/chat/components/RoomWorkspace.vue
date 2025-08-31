@@ -1,14 +1,16 @@
-<!-- /src/features/chat/components/WorkSpace.vue -->
+<!-- /src/features/chat/components/Workspace.vue -->
 <template>
   <div class="h-full flex flex-col bg-gray-50">
     <!-- Header -->
     <div class="bg-white border-b border-gray-200 p-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
-          <div :class="['w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold',
-            workspace?.color || 'bg-blue-500']">
-
-
+          <div
+            :class="[
+              'w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold',
+              workspace?.color || 'bg-blue-500'
+            ]"
+          >
             {{ (workspace?.name || '개발')[0]?.toUpperCase() }}
           </div>
           <div>
@@ -23,8 +25,13 @@
 
         <!-- 참여자 패널 토글 -->
         <div class="flex items-center space-x-2">
-          <button @click="toggleParticipants" :class="['p-2 rounded-lg transition-colors',
-            showParticipants ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100']">
+          <button
+            @click="toggleParticipants"
+            :class="[
+              'p-2 rounded-lg transition-colors',
+              showParticipants ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+            ]"
+          >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -53,18 +60,19 @@
         </div>
 
         <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div ref="msgListRef" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <div v-if="messagesError" class="text-xs text-red-600">{{ messagesError }}</div>
           <div v-for="message in messages" :key="message.id" class="flex space-x-3">
             <div
               class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-              {{ message.author.charAt(0) }}
+              {{ message.author?.charAt(0) || '?' }}
             </div>
             <div class="flex-1">
               <div class="flex items-center space-x-2 mb-1">
                 <span class="font-medium text-gray-900">{{ message.author }}</span>
                 <span class="text-xs text-gray-500">{{ message.time }}</span>
               </div>
-              <p class="text-gray-700">{{ message.content }}</p>
+              <p class="text-gray-700 whitespace-pre-line">{{ message.content }}</p>
             </div>
           </div>
         </div>
@@ -72,9 +80,14 @@
         <!-- Input -->
         <div class="border-t border-gray-200 bg-white p-4">
           <div class="flex items-center space-x-2">
-            <input v-model="newMessage" @keyup.enter="sendMessage" type="text" placeholder="메시지를 입력하세요..."
+            <input
+              v-model="newMessage"
+              @keyup.enter="sendMessage"
+              type="text"
+              placeholder="메시지를 입력하세요..."
               class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <button @click="sendMessage"
+            <button
+              @click="sendMessage"
               class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
               전송
             </button>
@@ -83,23 +96,26 @@
 
         <!-- Participants -->
         <div v-if="showParticipants" class="w-64 bg-white border-l border-gray-200 flex flex-col">
-          <!-- 헤더 (초대 버튼) -->
           <div class="p-4 border-b border-gray-200">
             <h3 class="text-sm font-semibold text-gray-900">참여자 ({{ memberCount }})</h3>
           </div>
 
-          <!-- 목록 -->
           <div class="flex-1 overflow-y-auto p-4">
             <div class="space-y-3">
-              <div v-for="p in participants" :key="p.id"
+              <div
+                v-for="p in participants" :key="p.id"
                 class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
                 <div class="relative">
                   <div
                     class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
                     {{ p.name.charAt(0) }}
                   </div>
-                  <div :class="['absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white',
-                    p.online ? 'bg-green-400' : 'bg-gray-300']"></div>
+                  <div
+                    :class="[
+                      'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white',
+                      p.online ? 'bg-green-400' : 'bg-gray-300'
+                    ]">
+                  </div>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-gray-900 truncate">{{ p.name }}</p>
@@ -114,13 +130,14 @@
           </div>
         </div>
       </div>
-    </div>\
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRoute } from 'vue-router' // 워크스페이스 ID 폴백용
+import { useRoute } from 'vue-router'
+import api from '@/shared/lib/api' // ✅ Axios 래퍼 사용(토큰/리프레시 자동)
 
 const props = defineProps({
   workspace: { type: Object, default: null },
@@ -128,43 +145,20 @@ const props = defineProps({
 
 const API = import.meta.env.VITE_API_URL || '/api'
 
-// 라우트 & WS ID 헬퍼
+/* ---------- 라우트 & 워크스페이스 ID ---------- */
 const route = useRoute()
-function getWorkspaceId() {
-  return (
-    props.workspace?.id ??
-    props.workspace?.workspaceId ??
-    props.workspace?.wsId ??
-    route.params.wsId ??
-    route.params.id ??
-    null
-  )
-}
+const wsId = computed(() =>
+  props.workspace?.id ??
+  props.workspace?.workspaceId ??
+  props.workspace?.wsId ??
+  route.params.wsId ??
+  route.params.id ??
+  null
+)
 
-const showParticipants = ref(false)
-const newMessage = ref('')
-const messages = ref([
-  { id: 1, author: '김개발', content: '새로운 기능 개발이 완료되었습니다!', time: '오후 2:30' },
-  { id: 2, author: '이디자인', content: 'UI 검토 부탁드립니다.', time: '오후 2:45' },
-  { id: 3, author: '박기획', content: '내일 회의 일정 공유드립니다.', time: '오후 3:00' },
-])
-
-const participants = ref([])
-const participantsLoading = ref(false)
-const participantsError = ref('')
-
+/* ---------- 상단 정보 ---------- */
 const wsName = computed(() => props.workspace?.name || '개발팀')
-const wsInitial = computed(() => wsName.value.charAt(0)?.toUpperCase() || '개')
 const channelName = computed(() => props.workspace?.name || '일반')
-
-// accepted !== false만 카운트. participants 비었을 때만 폴백(_count.members + 1(owner))
-const memberCount = computed(() => {
-  if (participants.value.length > 0) {
-    return participants.value.filter((p) => p.accepted !== false).length
-  }
-  const base = props.workspace?._count?.members ?? props.workspace?.memberCount ?? 0
-  return base + 1
-})
 
 function formatDate(dateString) {
   if (!dateString) return ''
@@ -181,6 +175,19 @@ const ownerName = computed(() => {
   return hit?.name || ''
 })
 
+/* ---------- 멤버 패널 ---------- */
+const showParticipants = ref(false)
+const participants = ref([])
+const participantsLoading = ref(false)
+const participantsError = ref('')
+const memberCount = computed(() => {
+  if (participants.value.length > 0) {
+    return participants.value.filter((p) => p.accepted !== false).length
+  }
+  const base = props.workspace?._count?.members ?? props.workspace?.memberCount ?? 0
+  return base + 1
+})
+
 function authHeaders() {
   const access = localStorage.getItem('accessToken')
   return {
@@ -189,20 +196,16 @@ function authHeaders() {
   }
 }
 
-function toggleParticipants() {
-  showParticipants.value = !showParticipants.value
-  if (showParticipants.value && participants.value.length === 0) fetchParticipants()
-}
-
 let abortCtrl = null
 async function fetchParticipants() {
-  if (!getWorkspaceId()) return
+  if (!wsId.value) return
   if (abortCtrl) abortCtrl.abort()
   abortCtrl = new AbortController()
   participantsLoading.value = true
   participantsError.value = ''
   try {
-    const res = await fetch(`${API}/workspaces/${getWorkspaceId()}/members`, {
+    // ⚠️ 백엔드 실제 경로 확인 필요: /workspaces/:id/members
+    const res = await fetch(`${API}/workspaces/${wsId.value}/members`, {
       headers: authHeaders(),
       signal: abortCtrl.signal,
     })
@@ -216,7 +219,7 @@ async function fetchParticipants() {
         m.role === 'owner' || String(user.id || '') === String(props.workspace?.ownerId || '')
 
       normalized.push({
-        id: m.id ?? `owner:${getWorkspaceId()}:${user.id}`,
+        id: m.id ?? `owner:${wsId.value}:${user.id}`,
         userId: user.id,
         name: user.nickname || user.email || '사용자',
         role: isOwner ? 'owner' : m.role || 'member',
@@ -233,7 +236,7 @@ async function fetchParticipants() {
     if (!hasOwner && (props.workspace?.ownerId || props.workspace?.owner?.id)) {
       const ownerUserId = props.workspace?.owner?.id ?? props.workspace?.ownerId
       normalized.unshift({
-        id: `owner:${getWorkspaceId()}:${ownerUserId}`,
+        id: `owner:${wsId.value}:${ownerUserId}`,
         userId: ownerUserId,
         name: props.workspace?.owner?.nickname || props.workspace?.owner?.email || '소유자',
         role: 'owner',
@@ -258,29 +261,118 @@ async function fetchParticipants() {
   }
 }
 
-watch(() => props.workspace?.id, () => {
-  participants.value = []
-  if (showParticipants.value) fetchParticipants()
-})
-
-onMounted(() => {
-  // 초기 자동 로드 선택 시:
-  // fetchParticipants()
-})
-
-function sendMessage() {
-  const txt = newMessage.value
-  if (!txt) return
-  messages.value.push({
-    id: messages.value.length + 1,
-    author: '나',
-    content: txt,
-    time: new Date().toLocaleTimeString('ko-KR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    }),
-  })
-  newMessage.value = ''
+function toggleParticipants() {
+  showParticipants.value = !showParticipants.value
+  if (showParticipants.value && participants.value.length === 0) fetchParticipants()
 }
+
+async function fetchOwnerDetail() {
+  if (!wsId.value) return
+  try {
+    const res = await fetch(`${API}/workspaces/${wsId.value}`, { headers: authHeaders() })
+    if (!res.ok) return
+    const ws = await res.json()
+
+    const ownerId = ws?.owner?.id ?? ws?.ownerId
+    if (!ownerId) return
+
+    const exists = participants.value.some(
+      (p) => p.isOwner || String(p.userId) === String(ownerId)
+    )
+    if (!exists) {
+      participants.value.unshift({
+        id: `owner:${wsId.value}:${ownerId}`,
+        userId: ownerId,
+        name: ws?.owner?.nickname || ws?.owner?.email || '소유자',
+        role: 'owner',
+        accepted: true,
+        joinedAt: ws?.createdAt ?? null,
+        lastLogin: ws?.owner?.lastLogin ?? null,
+        avatar: ws?.owner?.avatar ?? null,
+        online: false,
+        isOwner: true,
+      })
+    }
+  } catch (e) {
+    // 소유자 보강 실패는 치명적이지 않으므로 경고만 남김
+    console.warn('fetchOwnerDetail failed:', e?.message || e)
+  }
+}
+
+
+/* ---------- 메시지 영역(백엔드 연동) ---------- */
+const msgListRef = ref(null)
+const messages = ref([])
+const messagesError = ref('')
+const newMessage = ref('')
+
+const scrollBottom = () => {
+  const el = msgListRef.value
+  if (el) el.scrollTop = el.scrollHeight
+}
+
+async function loadMessages(page = 1, limit = 50) {
+  messagesError.value = ''
+  if (!wsId.value) return
+  try {
+    // 백엔드 경로: /chat/workspace/:workspaceId (GET)
+    const { data } = await api.get(`/chat/workspace/${wsId.value}`, {
+      params: { page, limit },
+    })
+    const rows = Array.isArray(data?.messages) ? data.messages : []
+    messages.value = rows.map((m) => ({
+      id: m.id,
+      author: m.user?.nickname || m.user?.email || `user#${m.userId}`,
+      content: m.content,
+      time: new Date(m.createdAt).toLocaleTimeString('ko-KR', {
+        hour: '2-digit', minute: '2-digit',
+      }),
+    }))
+    await nextTick()
+    scrollBottom()
+    // 읽음 처리(선택): /chat/workspace/:id/read
+    api.post(`/chat/workspace/${wsId.value}/read`)
+  } catch (e) {
+    messagesError.value = e?.response?.data?.error || e?.message || '메시지 로드 실패'
+  }
+}
+
+async function sendMessage() {
+  const txt = newMessage.value?.trim()
+  if (!wsId.value || !txt) return
+  try {
+    // 백엔드 경로: /chat/workspace/:workspaceId (POST)
+    const { data: m } = await api.post(`/chat/workspace/${wsId.value}`, { content: txt })
+    // API가 반환한 형식으로 푸시
+    messages.value.push({
+      id: m.id,
+      author: m.user?.nickname || m.user?.email || '나',
+      content: m.content,
+      time: new Date(m.createdAt).toLocaleTimeString('ko-KR', {
+        hour: '2-digit', minute: '2-digit',
+      }),
+    })
+    newMessage.value = ''
+    await nextTick()
+    scrollBottom()
+  } catch (e) {
+    messagesError.value = e?.response?.data?.error || e?.message || '전송 실패'
+  }
+}
+
+/* ---------- 라이프사이클 ---------- */
+watch(() => wsId.value, async () => {
+  participants.value = []
+  messages.value = []
+  if (showParticipants.value) fetchParticipants()
+  await loadMessages()
+})
+
+onMounted(async () => {
+  await loadMessages()
+})
+
+onUnmounted(() => {
+  abortCtrl?.abort()
+})
 </script>

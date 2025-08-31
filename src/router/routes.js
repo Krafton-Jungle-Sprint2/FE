@@ -3,7 +3,8 @@ import MainLayout from '@/layouts/MainLayout.vue'
 import LoginPage from '@/features/auth/pages/LoginPage.vue'
 import SignupPage from '@/features/auth/pages/SignupPage.vue'
 import TodoPage from '@/features/todo/pages/TodoPage.vue'
-
+import TeamChatPage from '@/features/chat/pages/TeamChatPage.vue'
+import TeamSchedulePage from '@/features/schedule/pages/TeamSchedulePage.vue'
 
 const routes = [
   { path: '/login', component: LoginPage },
@@ -12,13 +13,13 @@ const routes = [
     path: '/',
     component: MainLayout,
     children: [
-      { path: '/todos', name: 'todos', component: TodoPage },
-      // { path: 'todos', component: TodoPage, meta: { requiresAuth: true } },
-      { path: 'chat', component: () => import('@/features/chat/pages/TeamChatPage.vue'), alias: ['/teamchatpage'] },//, meta: { requiresAuth: true } },
-      { path: 'schedule', component: () => import('@/features/schedule/pages/TeamSchedulePage.vue'), alias: ['/teamschedulepage'] },//, meta: { requiresAuth: true } },
-      { path: 'profile', component: () => import('@/features/profile/pages/MyPage.vue') },//, meta: { requiresAuth: true } },
-    ]
-  }
+      { path: 'todos', component: TodoPage, meta: { requiresAuth: true } },
+      { path: 'chat/:wsId?', component: () => import('@/features/chat/pages/TeamChatPage.vue') },
+      { path: 'chat', component: TeamChatPage, alias: ['/teamchatpage'] },
+      { path: 'schedule', component: TeamSchedulePage, alias: ['/teamschedulepage'] },
+      { path: 'profile', component: () => import('@/features/profile/MyPage.vue') },
+    ],
+  },
 ]
 
-export default routes   // ✅ 반드시 필요
+export default routes

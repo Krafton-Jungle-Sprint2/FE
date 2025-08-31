@@ -1,19 +1,27 @@
 <template>
-  <div class="h-screen bg-gray-50 flex flex-col">
+  <div class="h-screen bg-gray-50 flex flex-col" :style="styleVars">
     <NavBar @toggle-sidebar="sidebarOpen = !sidebarOpen" />
 
-    <!-- 워크스페이스 사이드바들을 조건부 렌더링으로 복원 -->
     <div class="flex" style="height: calc(100vh - 3.5rem)">
-      <SideNav :open="sidebarOpen" @close="sidebarOpen = false" />
+      <!-- 사이드바 폭을 변수로 고정 -->
+      <SideNav :open="sidebarOpen" @close="sidebarOpen = false" :style="{ width: 'var(--sidebar-w)' }" />
 
       <!-- 채팅 라우트에서만 RoomSidebar 표시 -->
-      <RoomSidebar v-if="showChatBar" @workspace-selected="onWorkspaceSelected" />
+      <RoomSidebar
+        v-if="showChatBar"
+        @workspace-selected="onWorkspaceSelected"
+        :style="{ width: 'var(--chatbar-w)' }"
+      />
 
       <!-- 스케줄 라우트에서만 ScheduleSidebar 표시 -->
-      <ScheduleSidebar v-if="showScheduleBar" @workspace-selected="onWorkspaceSelected" />
+      <ScheduleSidebar
+        v-if="showScheduleBar"
+        @workspace-selected="onWorkspaceSelected"
+        :style="{ width: 'var(--chatbar-w)' }"
+      />
 
       <main class="flex-1 overflow-auto">
-        <div class=" container mx-auto px-4 py-6 md:ml-[var(--content-offset)]">
+        <div class="container px-4 py-6">
           <router-view :selected-workspace="selectedWorkspace" />
         </div>
       </main>
@@ -22,8 +30,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed } from 'vue'          // ✅ useRouter 제거
+import { useRoute } from 'vue-router'        // ✅ 그대로
 import NavBar from '@/components/NavBar.vue'
 import SideNav from '@/components/SideNav.vue'
 import RoomSidebar from '@/features/chat/components/RoomSidebar.vue'

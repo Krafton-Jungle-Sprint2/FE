@@ -3,7 +3,7 @@
   <div class="w-full h-full flex">
     <div class="flex-1 relative">
       <!-- 항상 WorkSpace 렌더. workspace가 없으면 기본 UI 표시(WorkSpace가 fallback 처리함). -->
-      <WorkSpace :workspace="workspace" />
+      <RoomWorkspace :workspace="selectedWorkspace || wsDetail" />
 
       <!-- 상태 배지 -->
       <div v-if="loading" class="absolute top-2 right-2 text-xs text-gray-600 bg-white/80 px-2 py-1 rounded">
@@ -17,49 +17,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import WorkSpace from '@/features/chat/components/WorkSpace.vue'
+import { ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import api from '@/shared/lib/api'
+import RoomWorkspace from '../components/RoomWorkspace.vue'
+
+const props = defineProps({ selectedWorkspace: { type: Object, default: null } })
 
 const route = useRoute()
-const router = useRouter()
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+const wsDetail = ref(null)
 
-const workspace = ref(null)
-const list = ref([])
-const loading = ref(false)
-const error = ref('')
+// 라우트 파라미터 우선, 없으면 props 사용
+const currentWsId = computed(() => route.params.wsId || props.selectedWorkspace?.id || null)
 
-function authHeaders() {
-  const access = localStorage.getItem('accessToken')
-  return { 'Content-Type': 'application/json', ...(access ? { Authorization: `Bearer ${access}` } : {}) }
-}
-
-async function loadList() {
-  loading.value = true; error.value = ''
+async function load () {
+  const id = currentWsId.value
+  if (!id) { wsDetail.value = null; return }
   try {
-    const res = await fetch(API + '/workspaces', { headers: authHeaders() })
-    if (res.status === 401) { router.push('/login'); return }
-    if (!res.ok) throw new Error('워크스페이스 조회 실패')
-    list.value = await res.json()
-    selectByRoute()
-  } catch (e) {
-    error.value = e.message || '로드 실패'
-  } finally {
-    loading.value = false
+    const { data } = await api.get(`/workspaces/${id}`)
+    wsDetail.value = data
+  } catch {
+    wsDetail.value = null
   }
 }
 
-function selectByRoute() {
-  const wsId = route.params.wsId || route.query.wsId
-  if (!Array.isArray(list.value) || list.value.length === 0) { workspace.value = null; return }
-  workspace.value = wsId
-    ? list.value.find(w => String(w.id) === String(wsId)) || list.value[0]
-    : list.value[0]
-}
-
-// 라우트가 바뀌면 선택만 변경(리스트는 캐시 유지)
-watch(() => [route.params.wsId, route.query.wsId], () => selectByRoute())
-
-onMounted(loadList)
+// 둘 다 감시 + 즉시 실행
+watch([() => route.params.wsId, () => props.selectedWorkspace?.id], load, { immediate: true })
 </script>
